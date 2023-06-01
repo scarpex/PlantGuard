@@ -1,0 +1,64 @@
+const int FeuchtSensor = A0;  // Feuchtigkeitssensor auf GPIO 34
+#define Pumpe 2  // Wasserpumpe auf GPIO 13
+#define PumpeON digitalWrite(Pumpe,HIGH)  // Wasserpumpe einschalten
+#define PumpeOFF digitalWrite(Pumpe,LOW)  // Wasserpumpe ausschalten
+#define LEDrot 13  // LED Rot auf GPIO 4
+#define LEDrotON  digitalWrite(LEDrot,HIGH) // LED Rot einschalten
+#define LEDrotOFF digitalWrite(LEDrot,LOW)  // LED Rot ausschalten
+#define LEDgruen 12 // LED Grün auf GPIO 16
+#define LEDgruenON  digitalWrite(LEDgruen,HIGH) // LED Grün einschalten
+#define LEDgruenOFF digitalWrite(LEDgruen,LOW)  // LED Grün ausschalten
+//#define B1 21 // Button B1 auf GPIO 21
+//#define B2 2  // Button B2 auf GPIO 2
+
+int wasser = 2000;  // Normale Wasserzufuhrszeit (2 Sekunden = 5.54cl)
+int potValue = 0;   // Feuchtigkeitssensor Initialwert
+
+void setup() {
+  // Button B1 und B2 als INPUT festlegen
+  //pinMode(B1, INPUT_PULLUP);
+  //pinMode(B2, INPUT_PULLUP);
+  // Serielle Kommunikation für das Auslesen des Feuchtigkeitssensors
+  Serial.begin(115200);
+  //analogSetPinAttenuation(FeuchtSensor, ADC_11db);
+  //analogReadResolution(12);
+  //analogSetWidth(12);
+  // LED Rot und LED Grün als Output festlegen
+  pinMode(LEDrot, OUTPUT);
+  pinMode(LEDgruen, OUTPUT);
+  pinMode(Pumpe, OUTPUT);
+} 
+
+void loop() {
+  // Button B1 wird gedrückt = Wasserzufuhr 12 Sekunden
+  //if (digitalRead(B1) == LOW) {
+    //wasser = 12000;
+    //Serial.println("Button1 wurde gedrückt");
+    //Serial.println(wasser);
+    // Button B2 wird gedrückt = Wasserzufuhr 4 Sekunden
+  //} //else if (digitalRead(B2) == LOW) {
+    //wasser = 4000;
+    //Serial.println("Button2 wurde gedrückt");
+    //Serial.println(wasser);
+  //}
+  // Werte von Feuchtigkeitssensor auslesen in Volt
+  delay(100);
+  potValue = analogRead(FeuchtSensor);
+  //Serial.println(potValue);
+  float voltage = potValue * (5.0 / 1024);
+  Serial.print(potValue); Serial.print(" relates to ");Serial.print(voltage);Serial.println(" Volt");
+  delay(500);
+  // Wenn Pflanze trocken ist (Feuchtigkeitssensor 0V) = LED Rot leuchtet und Wasserpumpe läuft
+  if (potValue <= 0) {
+      LEDgruenOFF;
+      LEDrotON;
+      delay(2000);
+      PumpeON;
+      delay(wasser);
+      PumpeOFF;
+      LEDrotOFF;
+      LEDgruenON;
+      delay(4000);
+  }
+  else LEDgruenON;
+}
